@@ -2,8 +2,8 @@ import matplotlib
 matplotlib.use('Qt5Agg')
 
 import math
-from evopy import EvoPy
-from evopy import ProgressReport
+from evopy.evopy import EvoPy
+from evopy.progress_report import ProgressReport
 from sklearn.metrics.pairwise import euclidean_distances
 import matplotlib.pyplot as plt
 import numpy as np
@@ -52,6 +52,7 @@ class CirclesInASquare:
         self.n_circles = n_circles
         self.fig = None
         self.ax = None
+        self.last_report = None
         assert 2 <= n_circles <= 20
 
         if self.plot_best_sol:
@@ -74,6 +75,7 @@ class CirclesInASquare:
             print("Generation Evaluations Best-fitness")
 
     def statistics_callback(self, report: ProgressReport):
+        self.last_report = report
         output = "{:>10d} {:>11d} {:>12.8f} {:>12.8f} {:>12.8f}".format(report.generation, report.evaluations,
                                                                         report.best_fitness, report.avg_fitness,
                                                                         report.std_fitness)
@@ -136,10 +138,10 @@ class CirclesInASquare:
         if self.plot_best_sol:
             plt.close()
 
-        return best_solution
+        return best_solution, self.last_report
 
 
 if __name__ == "__main__":
     circles = 10
-    runner = CirclesInASquare(circles, plot_sols=True)
+    runner = CirclesInASquare(circles, plot_sols=False)
     best = runner.run_evolution_strategies()
