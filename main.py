@@ -2,8 +2,8 @@ import matplotlib
 matplotlib.use('Qt5Agg')
 
 import math
-from evopy.evopy import EvoPy
-from evopy.progress_report import ProgressReport
+from evopy import EvoPy
+from evopy import ProgressReport
 from sklearn.metrics.pairwise import euclidean_distances
 import matplotlib.pyplot as plt
 import numpy as np
@@ -45,7 +45,7 @@ def circles_in_a_square(individual):
 
 
 class CirclesInASquare:
-    def __init__(self, n_circles, output_statistics=True, plot_sols=False, print_sols=False):
+    def __init__(self, n_circles, output_statistics=True, plot_sols=False, print_sols=False, random_seed=None):
         self.print_sols = print_sols
         self.output_statistics = output_statistics
         self.plot_best_sol = plot_sols
@@ -53,6 +53,7 @@ class CirclesInASquare:
         self.fig = None
         self.ax = None
         self.last_report = None
+        self.random_seed = random_seed
         assert 2 <= n_circles <= 20
 
         if self.plot_best_sol:
@@ -76,6 +77,7 @@ class CirclesInASquare:
 
     def statistics_callback(self, report: ProgressReport):
         self.last_report = report
+
         output = "{:>10d} {:>11d} {:>12.8f} {:>12.8f} {:>12.8f}".format(report.generation, report.evaluations,
                                                                         report.best_fitness, report.avg_fitness,
                                                                         report.std_fitness)
@@ -105,16 +107,16 @@ class CirclesInASquare:
             0.517638090205041524697797675248,  # 8
             0.500000000000000000000000000000,  # 9
             0.421279543983903432768821760651,  # 10
-            0.398207310236844165221512929748,
-            0.388730126323020031391610191835,
-            0.366096007696425085295389370603,
-            0.348915260374018877918854409001,
-            0.341081377402108877637121191351,
-            0.333333333333333333333333333333,
-            0.306153985300332915214516914060,
-            0.300462606288665774426601772290,
-            0.289541991994981660261698764510,
-            0.286611652351681559449894454738
+            0.398207310236844165221512929748,  # 11
+            0.388730126323020031391610191835,  # 12
+            0.366096007696425085295389370603,  # 13
+            0.348915260374018877918854409001,  # 14
+            0.341081377402108877637121191351,  # 15
+            0.333333333333333333333333333333,  # 16
+            0.306153985300332915214516914060,  # 17
+            0.300462606288665774426601772290,  # 18
+            0.289541991994981660261698764510,  # 19
+            0.286611652351681559449894454738   # 20
         ]
 
         return values_to_reach[self.n_circles - 2]
@@ -127,10 +129,11 @@ class CirclesInASquare:
             self.n_circles * 2,  # Number of parameters
             reporter=callback,  # Prints statistics at each generation
             maximize=True,
-            generations=1000,
+            generations=500,
             bounds=(0, 1),
+            lasso_init=True,
             target_fitness_value=self.get_target(),
-            max_evaluations=1e5,
+            max_evaluations=1e6,
         )
 
         best_solution = evopy.run()
@@ -142,6 +145,6 @@ class CirclesInASquare:
 
 
 if __name__ == "__main__":
-    circles = 10
-    runner = CirclesInASquare(circles, plot_sols=False)
+    circles = 9
+    runner = CirclesInASquare(circles, plot_sols=True)
     best = runner.run_evolution_strategies()
